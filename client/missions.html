@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen">
+    <!-- Header con botón de cerrar sesión y botón de crear misión -->
+    <header class="bg-indigo-600 p-4 flex justify-between items-center">
+        <h1 class="text-white text-2xl font-bold">Misiones</h1>
+        <div class="space-x-2">
+            <button id="createMissionButton" class="bg-white text-indigo-600 px-4 py-2 rounded-md hover:bg-gray-100 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Crear misión
+            </button>
+            <button id="logoutButton" class="bg-white text-indigo-600 px-4 py-2 rounded-md hover:bg-gray-100 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Cerrar sesión
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor para las misiones -->
+    <div id="missionsContainer" class="p-8 space-y-4">
+        <p id="loadingMessage" class="text-gray-700 text-xl">Cargando misiones...</p>
+    </div>
+
+    <!-- Modal para crear misión -->
+    <div id="createMissionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Crear nueva misión</h2>
+            <form id="createMissionForm" class="space-y-4">
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre de la misión</label>
+                    <input type="text" id="nombre" name="nombre" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
+                <div>
+                    <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para actualizar progreso de misión -->
+    <div id="updateProgressModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Actualizar Progreso de la Misión</h2>
+            <form id="updateProgressForm" class="space-y-4">
+                <input type="hidden" id="missionId" name="missionId">
+                <div>
+                    <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                    <select id="estado" name="estado" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="puntaje" class="block text-sm font-medium text-gray-700">Puntaje</label>
+                    <input type="number" id="puntaje" name="puntaje" required min="0" max="100" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="fechaFinalizacion" class="block text-sm font-medium text-gray-700">Fecha de Finalización</label>
+                    <input type="datetime-local" id="fechaFinalizacion" name="fechaFinalizacion" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="informacionAdicional" class="block text-sm font-medium text-gray-700">Información Adicional</label>
+                    <textarea id="informacionAdicional" name="informacionAdicional" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                </div>
+                <div>
+                    <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen</label>
+                    <input type="file" id="imagen" name="imagen" accept=".jpg, .jpeg, .png, .gif" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="imagenDescripcion" class="block text-sm font-medium text-gray-700">Descripción de la imagen</label>
+                    <textarea id="imagenDescripcion" name="imagenDescripcion" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelUpdateButton" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">Cancelar</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ver actualizaciones de misión -->
+    <div id="viewUpdatesModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Actualizaciones de la Misión</h2>
+            <div id="updatesContainer" class="space-y-4 max-h-64 overflow-y-auto">
+                <!-- Aquí se llenarán las actualizaciones de la misión -->
+            </div>
+            <div class="flex justify-end space-x-2 mt-4">
+                <button id="closeUpdatesButton" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Lógica para cerrar sesión
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            sessionStorage.removeItem('authToken');
+            window.location.href = '/login';
+        });
+
+        // Función para cargar las misiones
+        async function loadMissions() {
+            const token = sessionStorage.getItem('authToken');
+
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/misiones', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const missions = await response.json();
+                    displayMissions(missions);
+                } else {
+                    document.getElementById('loadingMessage').textContent = 'Error al cargar las misiones';
+                }
+            } catch (error) {
+                console.error('Error en la petición:', error);
+                document.getElementById('loadingMessage').textContent = 'Error al cargar las misiones';
+            }
+        }
+
+        // Función para mostrar las misiones
+        function displayMissions(missions) {
+            const container = document.getElementById('missionsContainer');
+            container.innerHTML = '';
+
+            if (missions.length === 0) {
+                container.innerHTML = '<p class="text-gray-700 text-xl">No hay misiones disponibles.</p>';
+                return;
+            }
+
+            missions.forEach(mission => {
+                const card = document.createElement('div');
+                card.className = 'bg-white shadow-md rounded-lg p-6';
+                card.innerHTML = `
+                    <h2 class="text-xl font-bold text-indigo-600 mb-2">${mission.nombre}</h2>
+                    <p class="text-gray-700 mb-4">${mission.descripcion}</p>
+                    <button class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 updateProgressButton" data-mission-id="${mission.id}">Actualizar Progreso</button>
+                    <button class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 viewUpdatesButton" data-mission-id="${mission.id}">Ver Actualizaciones</button>
+                `;
+                container.appendChild(card);
+            });
+
+            // Agregar eventos para los botones de actualizar progreso
+            document.querySelectorAll('.updateProgressButton').forEach(button => {
+                button.addEventListener('click', function () {
+                    const missionId = this.getAttribute('data-mission-id');
+                    document.getElementById('missionId').value = missionId;
+                    document.getElementById('updateProgressModal').classList.remove('hidden');
+                });
+            });
+
+            // Agregar eventos para los botones de ver actualizaciones
+            document.querySelectorAll('.viewUpdatesButton').forEach(button => {
+                button.addEventListener('click', async function () {
+                    const missionId = this.getAttribute('data-mission-id');
+                    await loadMissionUpdates(missionId);
+                    document.getElementById('viewUpdatesModal').classList.remove('hidden');
+                });
+            });
+        }
+
+        // Función para cargar las actualizaciones de una misión
+        async function loadMissionUpdates(missionId) {
+            const token = sessionStorage.getItem('authToken');
+
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/misiones/${missionId}/actualizaciones`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const updates = await response.json();
+                    displayUpdates(updates);
+                } else {
+                    console.error('Error al cargar las actualizaciones de la misión');
+                    document.getElementById('updatesContainer').innerHTML = '<p class="text-gray-700">Error al cargar las actualizaciones.</p>';
+                }
+            } catch (error) {
+                console.error('Error en la petición:', error);
+                document.getElementById('updatesContainer').innerHTML = '<p class="text-gray-700">Error al cargar las actualizaciones.</p>';
+            }
+        }
+
+        // Función para mostrar las actualizaciones en el modal
+        function displayUpdates(updates) {
+            const updatesContainer = document.getElementById('updatesContainer');
+            updatesContainer.innerHTML = '';
+
+            if (updates.length === 0) {
+                updatesContainer.innerHTML = '<p class="text-gray-700">No hay actualizaciones disponibles para esta misión.</p>';
+                return;
+            }
+
+            updates.forEach(update => {
+                const updateItem = document.createElement('div');
+                updateItem.className = 'bg-gray-100 p-4 rounded-md shadow-sm';
+                updateItem.innerHTML = `
+                    <p><strong>Estado:</strong> ${update.estado}</p>
+                    <p><strong>Puntaje:</strong> ${update.puntaje}</p>
+                    <p><strong>Fecha de Finalización:</strong> ${new Date(update.fecha_finalizacion).toLocaleString()}</p>
+                    <p><strong>Información Adicional:</strong> ${update.informacion_adicional}</p>
+                    ${update.imagen_ruta ? `<img src="${update.imagen_ruta}" alt="Imagen de actualización" class="mt-2 max-w-full h-auto rounded-md">` : ''}
+                    <p><strong>Descripción de la imagen:</strong> ${update.imagen_descripcion}</p>
+                `;
+                updatesContainer.appendChild(updateItem);
+            });
+        }
+
+
+        // Función para abrir el modal de crear misión
+        document.getElementById('createMissionButton').addEventListener('click', function() {
+            document.getElementById('createMissionModal').classList.remove('hidden');
+        });
+
+        // Función para cerrar el modal de crear misión
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            document.getElementById('createMissionModal').classList.add('hidden');
+        });
+
+        // Función para cerrar el modal de actualizar progreso
+        document.getElementById('cancelUpdateButton').addEventListener('click', function() {
+            document.getElementById('updateProgressModal').classList.add('hidden');
+        });
+
+        // Función para cerrar el modal de actualizaciones
+        document.getElementById('closeUpdatesButton').addEventListener('click', function () {
+            document.getElementById('viewUpdatesModal').classList.add('hidden');
+        });
+
+
+        // Lógica para crear una nueva misión
+        document.getElementById('createMissionForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById('nombre').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const token = sessionStorage.getItem('authToken');
+
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const data = {
+                nombre: nombre,
+                descripcion: descripcion
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/misiones', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    document.getElementById('createMissionModal').classList.add('hidden');
+                    loadMissions(); // Recargar las misiones
+                } else {
+                    console.error('Error al crear la misión');
+                }
+            } catch (error) {
+                console.error('Error en la petición', error);
+            }
+        });
+
+        // Lógica para actualizar el progreso de una misión
+        document.getElementById('updateProgressForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const missionId = document.getElementById('missionId').value;
+            const estado = document.getElementById('estado').value;
+            const puntaje = parseInt(document.getElementById('puntaje').value, 10);
+            const fechaFinalizacion = document.getElementById('fechaFinalizacion').value;
+            const informacionAdicional = document.getElementById('informacionAdicional').value;
+            const imagenDescripcion = document.getElementById('imagenDescripcion').value;
+            const imagen = document.getElementById('imagen').files[0];
+            const token = sessionStorage.getItem('authToken');
+
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('missionId', missionId);
+            formData.append('estado', estado);
+            formData.append('puntaje', puntaje);
+            formData.append('fechaFinalizacion', fechaFinalizacion);
+            formData.append('informacionAdicional', informacionAdicional);
+            formData.append('imagenDescripcion', imagenDescripcion);
+            if (imagen) {
+                formData.append('imagen', imagen);
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/progreso', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    document.getElementById('updateProgressModal').classList.add('hidden');
+                    loadMissions(); // Recargar las misiones
+                } else {
+                    console.error('Error al actualizar el progreso de la misión');
+                }
+            } catch (error) {
+                console.error('Error en la petición', error);
+            }
+        });
+
+        // Cargar las misiones cuando se carga la página
+        document.addEventListener('DOMContentLoaded', loadMissions);
+    </script>
+</body>
+</html>
